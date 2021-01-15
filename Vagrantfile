@@ -20,6 +20,7 @@ SCRIPT
 
 $rundeck = <<-SCRIPT
 yum update -y 
+yum install vim -y
 rpm -Uvh http://repo.rundeck.org/latest.rpm
 yum install rundeck java -y
 yum update rundeck -y
@@ -66,6 +67,14 @@ echo "Creating Prometheus service"
 docker run -d -p 9090:9090 prom/prometheus
 SCRIPT
 
+$filrewall_selinux = <<-SCRIPT
+echo "Disable Firewall"
+systemctl stop firewalld && systemctl disable firewalld
+echo "Disable Selinux"
+setenforce 0
+sed -i s/SELINUX=enforcing/SELINUX=disabled/g /etc/selinux/config
+SCRIPT
+
 
 node1disk1 = "./node1disk1.vdi";
 node2disk1 = "./node2disk1.vdi";
@@ -91,9 +100,10 @@ Vagrant.configure("2") do |config|
           vb.customize ['storageattach', :id,  '--storagectl', 'IDE', '--port', 0, '--device', 1, '--type', 'hdd', '--medium', node1disk1]
         end
       end
+      # node1.vm.provision "shell", inline: $filrewall_selinux
       node1.vm.provision "shell", inline: $sdb1
       node1.vm.provision "shell", inline: $rundeck
-      node1.vm.provision "shell", inline: $docker
+      # node1.vm.provision "shell", inline: $docker
       
     end
   
