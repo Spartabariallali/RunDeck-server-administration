@@ -2,3 +2,4 @@ node1disk1.vdi
 node2disk1.vdi
 node3disk1.vdi
 .vagrant
+ansible-plugin-3.1.1.jar

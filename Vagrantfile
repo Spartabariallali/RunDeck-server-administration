@@ -21,11 +21,46 @@ SCRIPT
 $rundeck = <<-SCRIPT
 yum update -y 
 yum install vim -y
+yum install git -y
+cd /vagrant
+mv ansible-plugin-3.1.1.jar /var/lib/rundeck/libext
 rpm -Uvh http://repo.rundeck.org/latest.rpm
 yum install rundeck java -y
 yum update rundeck -y
 service rundeckd start
+sed -i 's/localhost:4440$/192.168.100.10:4440/g' /etc/rundeck/framework.properties
+sed -i 's/localhost:4440$/192.168.100.10:4440/g' /etc/rundeck/rundeck-config.properties
+systemctl restart rundeckd
 SCRIPT
+
+$ansible_config = <<-SCRIPT
+yum install epel-release -y
+yum install python devel ansible -y 
+echo "192.168.100.10 node1" >> /etc/hosts
+echo "192.168.100.11 node2" >> /etc/hosts 
+echo "192.168.100.12 node3" >> /etc/hosts 
+rm -rf /etc/ansible/hosts
+echo "[linux]" >> /etc/ansible/hosts
+echo "node1" >> /etc/ansible/hosts 
+echo "node2" >> /etc/ansible/hosts 
+echo "node3" >> /etc/ansible/hosts 
+sed -i 's/#host_key_auto_add = True/host_key_auto_add = True/g' /etc/ansible/ansible.cfg
+chown rundeck.rundeck -R /etc/ansible
+SCRIPT
+
+
+$pubkey_authentication = <<-SCRIPT
+sed -i 's/#PubkeyAuthtication yes/PubkeyAuthentication yes/g' /etc/ansible/ansible.cfg
+systemctl restart sshd
+SCRIPT
+
+$rundeck_user = <<-SCRIPT 
+sudo useradd -p $(openssl passwd -1 pl,mkoijn ) rundeck
+SCRIPT
+
+
+$rundeck_copy_ssh_id = <<-SCRIPT 
+sshpass -p rundeck  ssh-copy-id -o StrictHostKeyChecking=no rundeck@192.168.100.11
 
 
 $docker = <<-SCRIPT
@@ -67,13 +102,6 @@ echo "Creating Prometheus service"
 docker run -d -p 9090:9090 prom/prometheus
 SCRIPT
 
-$filrewall_selinux = <<-SCRIPT
-echo "Disable Firewall"
-systemctl stop firewalld && systemctl disable firewalld
-echo "Disable Selinux"
-setenforce 0
-sed -i s/SELINUX=enforcing/SELINUX=disabled/g /etc/selinux/config
-SCRIPT
 
 
 node1disk1 = "./node1disk1.vdi";
@@ -93,6 +121,7 @@ Vagrant.configure("2") do |config|
       node1.vm.define "node1"
       node1.vm.box_download_insecure = true
       node1.vm.box = "centos/7"
+      node1.vm.synced_folder ".", "/vagrant", disabled: false
       node1.vm.provider "virtualbox" do |vb|
         vb.memory = "2048"
         if not File.exists?(node1disk1)
@@ -100,7 +129,7 @@ Vagrant.configure("2") do |config|
           vb.customize ['storageattach', :id,  '--storagectl', 'IDE', '--port', 0, '--device', 1, '--type', 'hdd', '--medium', node1disk1]
         end
       end
-      # node1.vm.provision "shell", inline: $filrewall_selinux
+
       node1.vm.provision "shell", inline: $sdb1
       node1.vm.provision "shell", inline: $rundeck
       # node1.vm.provision "shell", inline: $docker
