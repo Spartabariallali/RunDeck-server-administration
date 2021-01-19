@@ -60,7 +60,10 @@ SCRIPT
 
 
 $rundeck_copy_ssh_id = <<-SCRIPT 
-sshpass -p rundeck  ssh-copy-id -o StrictHostKeyChecking=no rundeck@192.168.100.11
+sshpass -p rundeck  ssh-copy-id -o StrictHostKeyChecking=no rundeck@node1
+sshpass -p rundeck  ssh-copy-id -o StrictHostKeyChecking=no rundeck@node2
+sshpass -p rundeck  ssh-copy-id -o StrictHostKeyChecking=no rundeck@node3
+SCRIPT
 
 
 $docker = <<-SCRIPT
