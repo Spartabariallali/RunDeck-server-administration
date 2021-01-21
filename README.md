@@ -32,6 +32,11 @@ Once vagrant initialising is completed... run the following commands:
 
 ```
 
+You can access the rundeck GUI from: 192.168.100.10:4440
+
+default username: admin 
+default password: admin 
+
 - create a new project 
 
 - on Rundeck Project Configuration tab select *edit default node executor* 
