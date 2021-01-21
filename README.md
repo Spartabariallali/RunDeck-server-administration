@@ -28,5 +28,19 @@ Once vagrant initialising is completed... run the following commands:
 
 ```
 
+### Rundeck configuration 
 
+```
+
+- create a new project 
+
+- on Rundeck Project Configuration tab select *edit default node executor* 
+  ssh key file path: /var/lib/rundeck/.ssh/id_rsa
+  ansible configuration file: /etc/ansible/ansible.cfg 
+
+- Edit nodes tab select *Ansible Resource Model*
+  ansible inventory file path: /etc/ansible/hosts 
+  ansible config file path: /etc/ansible/ansible.cfg 
+
+```
 
