@@ -14,7 +14,7 @@ cd linux-server-administration-task-2
 
 vagrant up 
 
-Once vagrant initialising is completed... run the following commands
+Once vagrant initialising is completed... run the following commands:
 
 1. vagrant ssh node1
 
@@ -24,7 +24,7 @@ Once vagrant initialising is completed... run the following commands
 
 4. run the previous command for rundeck@node2 & rundeck@node3 
 
-5 ansible -m ping linux - to verify ansible configuration is working as expected 
+5  ansible -m ping linux - to verify ansible configuration is working as expected 
 
 ```
 
