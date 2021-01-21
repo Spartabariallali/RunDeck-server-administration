@@ -37,7 +37,7 @@ You can access the rundeck GUI from: 192.168.100.10:4440
 default username: admin 
 default password: admin 
 
-- create a new project 
+- create a New Project 
 
 - on Rundeck Project Configuration tab select *edit default node executor* 
   ssh key file path: /var/lib/rundeck/.ssh/id_rsa
